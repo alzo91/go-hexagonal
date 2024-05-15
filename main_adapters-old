@@ -1,0 +1,26 @@
+package main
+
+import (
+	"database/sql"
+	"fmt"
+	"log"
+
+	productDb "github.com/alzo91/go-hexagonal/adapters/db"
+	productServices "github.com/alzo91/go-hexagonal/application"
+)
+
+func main() {
+	db, _ := sql.Open("sqlite3", "sqlite.db")
+
+	productAdapter := productDb.NewProductDb(db)
+	productService := productServices.NewProductService(productAdapter)
+
+	productCreated, err := productService.Create("Pencil", 10)
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	fmt.Println(productCreated.GetID(), productCreated.GetName(), productCreated.GetPrice())
+	productService.Enable(productCreated)
+}
+
